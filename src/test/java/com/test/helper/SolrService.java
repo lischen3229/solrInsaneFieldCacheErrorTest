@@ -18,11 +18,11 @@ import java.util.List;
 /**
  * Building the Solr query and searching in Solr
  */
-public class QueryBuilder  {
+public class SolrService {
 
     private SolrServer solrServer;
 
-    public QueryBuilder(SolrServer solrServer) {
+    public SolrService(SolrServer solrServer) {
         this.solrServer = solrServer;
     }
 
@@ -77,7 +77,7 @@ public class QueryBuilder  {
                 // ------------------- CHANGE QUERY HERE TO REPRODUCE THE ERROR ------------------------
                 //TODO: for reproducing the error, uncomment the next line with the GROUP_FACET
 
-                .set(GroupParams.GROUP_FACET, "true") //use group counts instead of document counts in facets
+                //.set(GroupParams.GROUP_FACET, "true") //use group counts instead of document counts in facets
                 .set(GroupParams.GROUP_TOTAL_COUNT, "true") //make sure the number of groups is returned for the total matches
                 .set(CommonParams.FL, "*,score")
                 .set("defType", "edismax")

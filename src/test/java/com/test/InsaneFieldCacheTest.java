@@ -1,7 +1,7 @@
 package com.test;
 
 import com.test.helper.MockCourseDocument;
-import com.test.helper.QueryBuilder;
+import com.test.helper.SolrService;
 import com.test.model.CourseDocument;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
@@ -19,14 +19,14 @@ import java.util.List;
 public class InsaneFieldCacheTest extends AbstractSolrTestCase
 {
     private static SolrServer solrServer;
-    private static QueryBuilder queryBuilder;
+    private static SolrService queryBuilder;
 
     @BeforeClass
     public static void init() throws Exception
     {
         initCore("solrconfig.xml", "schema.xml", "solr", "insane");
         solrServer = new EmbeddedSolrServer(h.getCoreContainer(), h.getCore().getName());
-        queryBuilder = new QueryBuilder(solrServer);
+        queryBuilder = new SolrService(solrServer);
 
         /* create initial data set */
         MockCourseDocument doc = new MockCourseDocument(0, 11);
