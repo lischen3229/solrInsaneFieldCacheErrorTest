@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<schema name="example" version="1.5">
+
+    <fields>
+        <!-- artificial, unique courseId. course_id + appointment_id -->
+        <field name="id" type="string" indexed="true" stored="true" multiValued="false"/>
+
+        <!-- course details -->
+        <field name="course_id" type="int" indexed="true" stored="true" multiValued="false"/>
+        <field name="course_title" type="text_de" indexed="true" stored="true"/>
+        <field name="course_description" type="text_de" indexed="true" stored="true"/>
+        <field name="course_studying_technique" type="text_de" indexed="true" stored="true"/>
+
+        <!-- appointment fields -->
+        <field name="appointment_id" type="int" indexed="true" stored="true"/>
+        <field name="appointment_title" type="text_de" indexed="true" stored="true"/>
+        <field name="appointment_start" type="date" indexed="true" stored="true"/>
+
+        <!-- sort fields, non-tokenized versions, copied via copyField, indexed but not multivalued -->
+        <field name="title_sort" type="text_for_sort" indexed="true" stored="false" multiValued="false"/>
+
+        <!-- facet fields -->
+        <field name="stf" type="string" indexed="true" stored="true" multiValued="false"/> <!-- facet for studying_technique -->
+
+        <!-- solr specific fields   -->
+        <field name="_version_" type="long" indexed="true" stored="true"/>
+        <field name="text" type="text_general" indexed="true" stored="false" multiValued="true"/>
+    </fields>
+
+    <uniqueKey>id</uniqueKey>
+
+    <!-- for sorting -->
+    <copyField source="course_title" dest="title_sort"/>
+
+    <!-- for faceting -->
+    <copyField source="course_studying_technique" dest="stf"/>
+
+    <types>
+        <fieldType name="int" class="solr.TrieIntField" precisionStep="0" positionIncrementGap="0" sortMissingLast="true"/>
+        <fieldType name="long" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0" sortMissingLast="true"/>
+        <fieldType name="string" class="solr.StrField" sortMissingLast="true"/>
+        <fieldType name="date" class="solr.TrieDateField" precisionStep="0" positionIncrementGap="0" sortMissingLast="true"/>
+
+        <!-- German Analyzer without the Stemming: standard tokenizer + lowercase + stopwords + synonyms  -->
+        <fieldType name="text_de" class="solr.TextField" positionIncrementGap="100">
+            <analyzer>
+                <tokenizer class="solr.StandardTokenizerFactory"/>
+                <filter class="solr.LowerCaseFilterFactory"/>
+            </analyzer>
+        </fieldType>
+
+        <!-- General Text analyser: standard tokenizer + lowercase - DO NOT USE THIS -->
+        <fieldType name="text_general" class="solr.TextField" positionIncrementGap="100">
+            <analyzer type="index">
+                <tokenizer class="solr.StandardTokenizerFactory"/>
+                <filter class="solr.LowerCaseFilterFactory"/>
+            </analyzer>
+            <analyzer type="query">
+                <tokenizer class="solr.StandardTokenizerFactory"/>
+                <filter class="solr.LowerCaseFilterFactory"/>
+            </analyzer>
+        </fieldType>
+
+        <!-- Text analyser for sorting: un-tokenized and lowercase -->
+        <fieldType name="text_for_sort" class="solr.TextField" sortMissingLast="true" omitNorms="true">
+            <analyzer>
+                <tokenizer class="solr.KeywordTokenizerFactory"/> <!-- Analyzer that only produces a single Term -->
+                <filter class="solr.LowerCaseFilterFactory" /> <!-- make sorting case-insensitive -->
+                <filter class="solr.TrimFilterFactory" /> <!-- remove trailing/leading white spaces-->
+                <filter class="solr.CollationKeyFilterFactory" language="de" strength="primary" /> <!-- German collation for sorting -->
+            </analyzer>
+        </fieldType>
+    </types>
+
+</schema>
